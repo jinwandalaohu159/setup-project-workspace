@@ -2,12 +2,12 @@
 
 ---
 name: setup-project-workspace
-description: Initialize a long-term agent-first workspace and ensure issue-tracker skill exists.
+description: Initialize a long-term agent-first workspace and ensure issue-tracker skills exist.
 ---
 
 # Setup Project Workspace
 
-Initialize a project-level `agents/` workspace and ensure the `issue-tracker` skill is available.
+Initialize a project-level `agents/` workspace and ensure issue-tracker skills are available.
 
 ## Goal
 
@@ -18,19 +18,27 @@ agents/
   README.md
   PROTOCOL.md
   CONTEXT.md
+  TRACKING.md
   issues/
 ```
 
 Also ensure:
 
 ```text
-~/.claude/skills/issue-tracker/
+~/.claude/skills/issue-tracker-local/
   SKILL.md
   scripts/
     issue_status.py
     create_issue.py
     set_issue_status.py
     reorder_issues.py
+```
+
+And optionally (when tracker is github):
+
+```text
+~/.claude/skills/issue-tracker-github/
+  SKILL.md
 ```
 
 exists.
@@ -52,7 +60,25 @@ exists.
 
 ## Steps
 
-### 1. Ensure project workspace
+### 1. Ask tracking mode
+
+Use `AskUserQuestion` to ask the user:
+
+> How do you want to track issues?
+
+Options:
+
+- `local` — Local file-based issue tracking only
+- `github` — Local issue tracking plus GitHub commit/push version management
+
+If the user chooses `github`:
+
+1. Check if `.git` exists in the project root. If not, run `git init`.
+2. Check if a git remote exists (`git remote -v`). If not, run `gh repo create` and add as origin.
+
+---
+
+### 2. Ensure project workspace
 
 Create missing directories:
 
@@ -77,7 +103,31 @@ Rules:
 
 ---
 
-### 2. Create or update project-local CLAUDE.md
+### 3. Generate TRACKING.md
+
+Create `agents/TRACKING.md` based on the user's tracking mode choice.
+
+If `agents/TRACKING.md` already exists, do not overwrite.
+
+Content template:
+
+```markdown
+---
+tracker: <user's choice: local|github>
+remote: <owner/repo if github, empty if local>
+---
+
+This file configures issue tracking mode.
+
+- `tracker`: `local` | `github`
+- `remote`: GitHub repo (e.g. `owner/repo`), required when tracker is `github`
+```
+
+Fill `remote` by extracting from `git remote -v` (origin URL) when tracker is github.
+
+---
+
+### 4. Create or update project-local CLAUDE.md
 
 Target only:
 
@@ -106,32 +156,57 @@ Rules:
 
 ---
 
-### 3. Ensure issue-tracker skill
+### 5. Ensure issue-tracker-local skill
 
 Create missing directories:
 
 ```text
-~/.claude/skills/issue-tracker/
-~/.claude/skills/issue-tracker/scripts/
+~/.claude/skills/issue-tracker-local/
+~/.claude/skills/issue-tracker-local/scripts/
 ```
 
 Copy template files into target folders using the current operating system's native copy operation:
 
 ```text
-issue-tracker/SKILL.md
-  -> ~/.claude/skills/issue-tracker/SKILL.md
+issue-tracker-local/SKILL.md
+  -> ~/.claude/skills/issue-tracker-local/SKILL.md
 
-issue-tracker/scripts/issue_status.py
-  -> ~/.claude/skills/issue-tracker/scripts/issue_status.py
+issue-tracker-local/scripts/issue_status.py
+  -> ~/.claude/skills/issue-tracker-local/scripts/issue_status.py
 
-issue-tracker/scripts/create_issue.py
-  -> ~/.claude/skills/issue-tracker/scripts/create_issue.py
+issue-tracker-local/scripts/create_issue.py
+  -> ~/.claude/skills/issue-tracker-local/scripts/create_issue.py
 
-issue-tracker/scripts/set_issue_status.py
-  -> ~/.claude/skills/issue-tracker/scripts/set_issue_status.py
+issue-tracker-local/scripts/set_issue_status.py
+  -> ~/.claude/skills/issue-tracker-local/scripts/set_issue_status.py
 
-issue-tracker/scripts/reorder_issues.py
-  -> ~/.claude/skills/issue-tracker/scripts/reorder_issues.py
+issue-tracker-local/scripts/reorder_issues.py
+  -> ~/.claude/skills/issue-tracker-local/scripts/reorder_issues.py
+```
+
+Rules:
+
+- Do not overwrite existing target files.
+- Do not inspect template contents before copying.
+- Preserve all copied files exactly.
+
+---
+
+### 6. Ensure issue-tracker-github skill (if needed)
+
+Only when the user chose `github`:
+
+Create missing directory:
+
+```text
+~/.claude/skills/issue-tracker-github/
+```
+
+Copy:
+
+```text
+issue-tracker-github/SKILL.md
+  -> ~/.claude/skills/issue-tracker-github/SKILL.md
 ```
 
 Rules:
@@ -145,5 +220,5 @@ Rules:
 ## Completion
 
 ```text
-Initialized agent workspace and ensured issue-tracker skill. Please restart Claude Code to load the new skill.
+Initialized agent workspace and ensured issue-tracker skills. Please restart Claude Code to load the new skills.
 ```

@@ -11,6 +11,7 @@ If any of the following Markdown files are not already in context, you MUST read
 - agents/README.md
 - agents/PROTOCOL.md
 - agents/CONTEXT.md
+- agents/TRACKING.md
 
 Use skills for issue operations.
 

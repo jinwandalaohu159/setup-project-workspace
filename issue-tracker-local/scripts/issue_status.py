@@ -7,6 +7,14 @@ ISSUES_DIR = Path("agents/issues")
 VALID_STATUS = {"draft", "ready", "doing", "done"}
 
 
+def _source_tag(issue: dict) -> str:
+    source = issue.get("source", "local")
+    remote_id = issue.get("remote_id")
+    if source == "github" and remote_id:
+        return f"[github #{remote_id}]"
+    return "[local]"
+
+
 def parse_frontmatter(path: Path):
     content = path.read_text(encoding="utf-8")
     match = re.match(r"^---\n(.*?)\n---", content, re.DOTALL)
@@ -58,12 +66,14 @@ def main():
 
     if doing:
         issue = doing[0]
-        print(f"DOING: {issue['_file']}")
+        source_tag = _source_tag(issue)
+        print(f"DOING: {issue['_file']} {source_tag}")
         return 0
 
     if ready:
         issue = sorted(ready, key=lambda x: int(str(x.get("id", 0))))[0]
-        print(f"NEXT: {issue['_file']}")
+        source_tag = _source_tag(issue)
+        print(f"NEXT: {issue['_file']} {source_tag}")
         return 0
 
     print("NO_WORK")

@@ -2,7 +2,7 @@
 
 This file defines project-level agent rules.
 
-Detailed issue operations are handled by the `issue-tracker` skill.
+Detailed issue operations are handled by the `issue-tracker-local` skill.
 
 ---
 
@@ -13,6 +13,7 @@ agents/
   README.md
   PROTOCOL.md
   CONTEXT.md
+  TRACKING.md
   issues/
 ```
 
@@ -24,7 +25,7 @@ agents/
 - `PROTOCOL.md` defines project-level rules.
 - `CONTEXT.md` stores long-term project knowledge.
 - `issues/` stores task data.
-- Issue operations must use the `issue-tracker` skill.
+- Issue operations must use the `issue-tracker-local` skill.
 
 ---
 
@@ -40,19 +41,20 @@ agents/CONTEXT.md
 
 Do not read all issue files by default.
 
-Use the `issue-tracker` skill to locate the relevant issue.
+Use the `issue-tracker-local` skill to locate the relevant issue.
 
 ---
 
 ## Issue Rules
 
-Use the `issue-tracker` skill for all issue operations, including:
+Use the `issue-tracker-local` skill for all issue operations, including:
 
 - creating issues
 - checking issue state
 - starting work
 - completing work
 - returning failed work to ready
+- check the tracker type in `agents/TRACKING.md` to decide whether to commit and push, check details in ## Git Rules
 
 Rules:
 
@@ -60,7 +62,7 @@ Rules:
 - Execution order is FIFO.
 - One issue must describe one problem.
 - New independent problems must be created as new issues.
-- Do not manually scan or modify issue files unless the `issue-tracker` skill is unavailable.
+- Do not manually scan or modify issue files unless the `issue-tracker-local` skill is unavailable.
 - An issue may be changed to `done` only after its work is completed and its current status is `doing`.
 
 ---
@@ -89,6 +91,12 @@ Refactor the implementation toward deep modules: simple public interfaces, hidde
 
 Do not mark the issue as `done` until tests pass and code-quality improvement is complete.
 
+After marking an issue as `done`:
+
+1. Read `agents/TRACKING.md`.
+2. If `tracker: github`, invoke the `issue-tracker-github` skill to commit and push.
+3. If `tracker: local` or missing, do not commit or push unless the user explicitly asks.
+
 ---
 
 ## Context Rules
@@ -109,15 +117,20 @@ Project-specific long-term knowledge should be stored in `CONTEXT.md`.
 
 Git records what actually changed.
 
-Do not commit or push unless the user explicitly asks.
+When `agents/TRACKING.md` has `tracker: local` or is missing, do not commit or push unless the user explicitly asks.
 
-When committing issue-related work, include the issue filename or id in the commit message when possible.
+When `agents/TRACKING.md` has `tracker: github`, MUST commit and push automatically after an issue is marked `done`. Use the `issue-tracker-github` skill. Each issue must be committed individually before starting the next — do not batch multiple issues into a single commit.
+
+When committing issue-related work, include the issue id in the commit message:
+
+- Local issue: `[<local_id>] commit message`
+- GitHub issue: `[<local_id>] commit message (#<github_issue_number>)`
 
 ---
 
 ## Fallback
 
-If the `issue-tracker` skill or required scripts are unavailable:
+If the `issue-tracker-local` skill or required scripts are unavailable:
 
 1. Stop.
 2. Report what is missing.

@@ -1,9 +1,9 @@
 ---
-name: issue-tracker
-description: Manage project issues under agents/issues, including issue creation, status inspection, and safe status updates.
+name: issue-tracker-local
+description: Manage local project issues under agents/issues, including issue creation, status inspection, and safe status updates.
 ---
 
-# Issue Tracker
+# Issue Tracker Local
 
 Use this skill for all issue operations in projects that contain an `agents/` workspace.
 
@@ -49,6 +49,8 @@ title: short issue title
 status: ready
 priority: medium
 author: user
+source: local
+remote_id:
 ---
 
 ## Description
@@ -133,8 +135,9 @@ python ${CLAUDE_SKILL_DIR}/scripts/issue_status.py
 Possible outputs:
 
 ```text
-DOING: 0001-example.md
-NEXT: 0002-example.md
+DOING: 0001-example.md [local]
+DOING: 0003-example.md [github #42]
+NEXT: 0002-example.md [local]
 NO_WORK
 ERROR: ...
 ```
@@ -177,6 +180,8 @@ Arguments:
 --expected     expected result after completion
 --priority     low | medium | high
 --author       user | agent
+--source       local | github
+--remote-id    GitHub issue number (required when source is github)
 ```
 
 Rules:
@@ -187,6 +192,10 @@ Rules:
 - Do not invent extra requirements.
 - `author: user` creates `status: ready`.
 - `author: agent` creates `status: draft`.
+- `source: local` is the default for issues created locally.
+- `source: github` is used when pulling a GitHub issue to local.
+- When `source: github`, `--remote-id` is required and the script checks for duplicates.
+- If an issue with the same `remote_id` already exists, creation is skipped.
 
 ---
 
@@ -232,6 +241,7 @@ Rules:
 - This only works on an issue whose current status is `doing`.
 - It changes `doing -> done`.
 - If the issue is not `doing`, the script exits with an error.
+- When `source: github`, the script prints `REMOTE_ID: <number>` on a second line for the github skill to use.
 
 ---
 

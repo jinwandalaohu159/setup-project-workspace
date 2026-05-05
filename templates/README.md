@@ -5,8 +5,10 @@ This directory is the agent workspace.
 ## Boot Order
 
 1. README.md
-2. PROTOCOL.md
-3. CONTEXT.md
+2. TRACKING.md
+3. PROTOCOL.md
+4. CONTEXT.md
+
 
 ## Principle
 

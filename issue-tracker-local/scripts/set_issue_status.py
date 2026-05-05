@@ -20,12 +20,15 @@ def find_issue(filename: str) -> Path:
     raise FileNotFoundError(f"Issue not found: {filename}")
 
 
-def parse_status(content: str) -> str | None:
+def parse_frontmatter(content: str) -> dict:
     match = re.match(r"^---\n(.*?)\n---", content, re.DOTALL)
     if not match:
         raise ValueError("Missing YAML frontmatter")
-    data = yaml.safe_load(match.group(1)) or {}
-    return data.get("status")
+    return yaml.safe_load(match.group(1)) or {}
+
+
+def parse_status(content: str) -> str | None:
+    return parse_frontmatter(content).get("status")
 
 
 def has_other_doing(current_path: Path) -> bool:
@@ -68,6 +71,24 @@ def set_issue_status(filename: str, target_status: str):
     )
     path.write_text(new_content, encoding="utf-8")
     print(f"Updated: {path} [{current_status} -> {target_status}]")
+
+    if target_status == "done":
+        frontmatter = parse_frontmatter(new_content)
+        if frontmatter.get("source") == "github" and frontmatter.get("remote_id"):
+            print(f"REMOTE_ID: {frontmatter['remote_id']}")
+
+        tracking_path = Path("agents/TRACKING.md")
+        if tracking_path.exists():
+            tracking_content = tracking_path.read_text(encoding="utf-8")
+            tracking_fm = parse_frontmatter(tracking_content)
+            tracker = tracking_fm.get("tracker", "local")
+        else:
+            tracker = "local"
+
+        if tracker == "github":
+            print("GITHUB_TRACKER: Issue finished. Always Must invoke issue-tracker-github skill to commit and push before starting any next issue")
+        else:
+            print("LOCAL_TRACKER: Issue finished. MUST NOT commit or push; local development only")
 
 
 def main():
