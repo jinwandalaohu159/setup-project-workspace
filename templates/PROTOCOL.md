@@ -65,6 +65,22 @@ Rules:
 
 ---
 
+## Completion Rules
+
+Before any issue, feature, or module is marked as complete, the agent must perform TDD.
+
+Use the `tdd` skill if available; otherwise, write and run the tests directly.
+
+Only after tests pass may the agent proceed to code-quality improvement.
+
+Use the `improve-codebase` skill if available.
+
+Refactor the implementation toward deep modules: simple public interfaces, hidden internal complexity, and clear boundaries.
+
+Do not mark the issue as `done` until tests pass and code-quality improvement is complete.
+
+---
+
 ## Context Rules
 
 Agents may read:
