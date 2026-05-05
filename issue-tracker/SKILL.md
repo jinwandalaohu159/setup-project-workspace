@@ -276,11 +276,22 @@ It does not change execution order.
 
 ## Reorder Issues
 
-If issue numbering has gaps (e.g., 0001, 0002, 0005), renumber all issues sequentially:
+Issue numbering gaps are a sequencing problem, not a missing-work problem.
+
+Agents normally should not delete later issues. Therefore, if numbering has gaps, assume the gap was intentionally created by the user unless there is clear evidence otherwise.
+
+If issue numbering has gaps, for example `0001`, `0002`, `0005`, renumber all issues sequentially:
 
 ```bash
 python ${CLAUDE_SKILL_DIR}/scripts/reorder_issues.py
 ```
+
+Rules:
+
+- Do not recreate a missing-number issue just to fill the gap.
+- Do not assume the missing number means issue creation failed.
+- Do not try to repair the deleted issue unless the user explicitly asks for it.
+- After reordering, run `issue_status.py` again and follow its result.
 
 ---
 
