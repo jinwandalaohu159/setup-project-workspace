@@ -65,6 +65,16 @@ Rules:
 
 ---
 
+## Small Steps Principle
+
+- Always make the smallest meaningful change at a time.
+- Prefer many small, clear steps over one large change.
+- Each step must be understandable, verifiable, and easy to revert.
+- Advance strictly in small steps when coding, testing, or refactoring — even with vibe coding.
+- One issue should naturally be completed through multiple small steps instead of a single big modification.
+
+---
+
 ## Completion Rules
 
 Before any issue, feature, or module is marked as complete, the agent must perform TDD.
