@@ -23,6 +23,8 @@ Use skills for issue operations.
 
 ### Workspace Maintenance Rules
 
+Agents must stay within the current project workspace by default. Any operation outside this workspace requires explicit user approval before proceeding.
+
 These files are long-term maintained by agents:
 
 ```text
