@@ -58,6 +58,8 @@ Use the `issue-tracker-local` skill for all issue operations, including:
 
 Rules:
 
+- Every change starts with an issue. When a user describes a problem or requests a change, create an issue first — this is the starting point of all work.
+- To find the next issue to work on, use `issue_status.py` — it handles ordering, status filtering, and author validation.
 - Only one issue may be `doing` at a time.
 - Execution order is FIFO.
 - One issue must describe one problem.

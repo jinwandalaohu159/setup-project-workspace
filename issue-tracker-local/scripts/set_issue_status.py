@@ -5,6 +5,7 @@ import yaml
 from pathlib import Path
 
 ISSUES_DIR = Path("agents/issues")
+PROGRESS_FILE = ISSUES_DIR / "issue-manager.yaml"
 
 ALLOWED_TRANSITIONS = {
     "draft": {"ready"},
@@ -44,6 +45,30 @@ def has_other_doing(current_path: Path) -> bool:
     return False
 
 
+def init_progress(issue_id: str):
+    PROGRESS_FILE.parent.mkdir(parents=True, exist_ok=True)
+    template = Path("templates/issue-manager.yaml")
+    if template.exists():
+        data = yaml.safe_load(template.read_text(encoding="utf-8")) or {}
+    else:
+        data = {}
+    data["current"] = issue_id
+    data["tdd_done"] = False
+    data["improve_done"] = False
+    PROGRESS_FILE.write_text(yaml.dump(data, default_flow_style=False), encoding="utf-8")
+
+
+def read_progress() -> dict:
+    if not PROGRESS_FILE.exists():
+        return {}
+    return yaml.safe_load(PROGRESS_FILE.read_text(encoding="utf-8")) or {}
+
+
+def reset_progress():
+    data = {"current": None, "tdd_done": False, "improve_done": False}
+    PROGRESS_FILE.write_text(yaml.dump(data, default_flow_style=False), encoding="utf-8")
+
+
 def set_issue_status(filename: str, target_status: str):
     path = find_issue(filename)
     content = path.read_text(encoding="utf-8")
@@ -61,6 +86,25 @@ def set_issue_status(filename: str, target_status: str):
     if current_status == "ready" and target_status == "doing":
         if has_other_doing(path):
             raise ValueError("Another issue is already doing")
+
+    if target_status == "doing":
+        issue_id = filename.replace(".md", "").split("-")[0]
+        init_progress(issue_id)
+
+    if target_status == "done":
+        progress = read_progress()
+        missing = []
+        if not progress.get("tdd_done"):
+            missing.append("tdd")
+        if not progress.get("improve_done"):
+            missing.append("improve-codebase")
+        if missing:
+            missing_str = " and ".join(missing)
+            print(
+                f"ERROR: Development workflow not completed. Missing required stages: {missing_str}. "
+                f"You MUST call the corresponding Skill() before marking the issue as done."
+            )
+            sys.exit(1)
 
     new_content = re.sub(
         r"^status:.*$",
@@ -89,6 +133,8 @@ def set_issue_status(filename: str, target_status: str):
             print("GITHUB_TRACKER: Issue finished. Always Must invoke issue-tracker-github skill to commit and push before starting any next issue")
         else:
             print("LOCAL_TRACKER: Issue finished. MUST NOT commit or push; local development only")
+
+        reset_progress()
 
 
 def main():

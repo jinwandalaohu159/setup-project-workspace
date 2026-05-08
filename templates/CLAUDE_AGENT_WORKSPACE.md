@@ -6,7 +6,7 @@ agents/
 
 ### Usage
 
-If any of the following Markdown files are not already in context, you MUST read them first:
+The following Markdown files are the first principle of development; if not already in context, you ALWAYS MUST read them first:
 
 - agents/README.md
 - agents/PROTOCOL.md

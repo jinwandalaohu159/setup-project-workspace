@@ -1,6 +1,6 @@
 ---
 name: issue-tracker-local
-description: Manage local project issues under agents/issues, including issue creation, status inspection, and safe status updates.
+description: When a user describes a problem or requests a change, use this skill to create an issue first. Also manages status inspection and safe status updates for issues under agents/issues.
 ---
 
 # Issue Tracker Local
@@ -125,6 +125,8 @@ Rules:
 ---
 
 ## Check Issue State
+
+`issue_status.py` is the only correct way to find the next issue — it handles FIFO ordering, status filtering, and author validation. Do not use Read or Glob to scan issue files directly.
 
 Use:
 
@@ -307,7 +309,7 @@ Rules:
 
 ## New Problems
 
-One issue must describe one problem.
+One issue must describe only one problem.
 
 If a new independent problem is discovered:
 

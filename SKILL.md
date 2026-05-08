@@ -32,6 +32,16 @@ Also ensure:
     create_issue.py
     set_issue_status.py
     reorder_issues.py
+
+~/.claude/skills/tdd/
+  SKILL.md
+  scripts/
+    mark_done.py
+
+~/.claude/skills/improve-codebase/
+  SKILL.md
+  scripts/
+    mark_done.py
 ```
 
 And optionally (when tracker is github):
@@ -184,6 +194,13 @@ issue-tracker-local/scripts/reorder_issues.py
   -> ~/.claude/skills/issue-tracker-local/scripts/reorder_issues.py
 ```
 
+Also copy the issue-manager.yaml template into agents/issues/:
+
+```text
+templates/issue-manager.yaml
+  -> agents/issues/issue-manager.yaml
+```
+
 Rules:
 
 - Do not overwrite existing target files.
@@ -217,8 +234,62 @@ Rules:
 
 ---
 
+### 7. Ensure tdd skill
+
+Create missing directory:
+
+```text
+~/.claude/skills/tdd/
+~/.claude/skills/tdd/scripts/
+```
+
+Copy:
+
+```text
+tdd/SKILL.md
+  -> ~/.claude/skills/tdd/SKILL.md
+
+tdd/scripts/mark_done.py
+  -> ~/.claude/skills/tdd/scripts/mark_done.py
+```
+
+Rules:
+
+- Do not overwrite existing target files.
+- Do not inspect template contents before copying.
+- Preserve all copied files exactly.
+
+---
+
+### 8. Ensure improve-codebase skill
+
+Create missing directory:
+
+```text
+~/.claude/skills/improve-codebase/
+~/.claude/skills/improve-codebase/scripts/
+```
+
+Copy:
+
+```text
+improve-codebase/SKILL.md
+  -> ~/.claude/skills/improve-codebase/SKILL.md
+
+improve-codebase/scripts/mark_done.py
+  -> ~/.claude/skills/improve-codebase/scripts/mark_done.py
+```
+
+Rules:
+
+- Do not overwrite existing target files.
+- Do not inspect template contents before copying.
+- Preserve all copied files exactly.
+
+---
+
 ## Completion
 
 ```text
-Initialized agent workspace and ensured issue-tracker skills. Please restart Claude Code to load the new skills.
+Initialized agent workspace and ensured necessary skills. Please restart Claude Code to load the new skills.
 ```
